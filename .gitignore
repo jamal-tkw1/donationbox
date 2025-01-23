@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/DonationBox.BlazorWebAssembly/bin
+/DonationBox.BlazorWebAssembly/.vs/DonationBox.BlazorWebAssembly/FileContentIndex
+/DonationBox.BlazorWebAssembly/obj
