@@ -1,0 +1,154 @@
+﻿@page "/donation"
+
+<PageTitle>Donation Entry</PageTitle>
+
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-5">
+    <MudPaper Class="gap-4 pa-4 my-4">
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3">Donation Form</MudText>
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h4">Upload and Extract Data from Images</MudText>
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
+                    <ActivatorContent>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload">
+                            Browse Files
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
+
+            </MudCardContent>
+        </MudCard>
+
+        <MudGrid>
+            @if (selectedFiles?.Count > 0)
+            {
+                @foreach (var fileInfo in selectedFiles)
+                {
+                    <MudItem xs="12" sm="12" md="12" xl="12" xxl="6">
+                        <MudPaper Class="pa-4 ma-2">
+                            <MudText Typo="Typo.subtitle1">@fileInfo.FileName</MudText>
+                            <MudImage Src="@fileInfo.PreviewImage" Alt="Preview" Style="max-width: 100%; height: auto;" />
+                            <MudButton Color="Color.Primary" Disabled="@fileInfo.IsExtracting" OnClick="@(() => ExtractData(fileInfo))">
+                                @(fileInfo.IsExtracting ? "Extracting..." : "Extract Data")
+                            </MudButton>
+                            @if (fileInfo.IsExtracting)
+                            {
+                                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+                            }
+                            @if (fileInfo.UploadProgress > 0)
+                            {
+                                <MudProgressLinear Value="@fileInfo.UploadProgress" Color="Color.Success" />
+                            }
+                        </MudPaper>
+                    </MudItem>
+                }
+            }
+        </MudGrid>
+    </MudPaper>
+
+    @if (selectedFile != null)
+    {
+        <MudPaper Class="gap-4 pa-4">
+            @*   <div class="text-center">
+        <MudAvatar Icon="@Icons.Material.Filled.Church" Size="Size.Large" Color="Color.Primary" />
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3">Church Donation Form</MudText>
+        </div> *@
+
+            <EditForm Model="@donationModel" OnValidSubmit="OnValidSubmit">
+                <DataAnnotationsValidator />
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="donationModel.CompanyId" Label="Company #" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="donationModel.CompanyName" Label="Company Name" />
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="donationModel.FirstName"
+                                      For="@(() => donationModel.FirstName)"
+                                      Label="First Name" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="donationModel.LastName"
+                                      For="@(() => donationModel.LastName)"
+                                      Label="Last Name" />
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="donationModel.Email"
+                                      For="@(() => donationModel.Email)"
+                                      Label="Email"
+                                      InputType="InputType.Email"
+                                      FullWidth="true" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField @bind-Value="donationModel.Phone"
+                                      For="@(() => donationModel.Phone)"
+                                      Label="Phone"
+                                      FullWidth="true" />
+                    </MudItem>
+                </MudGrid>
+
+                <MudText Typo="Typo.h6" Class="mt-3">Address</MudText>
+                <MudTextField @bind-Value="donationModel.StreetAddress" Label="Street Address" FullWidth="true" />
+                <MudTextField @bind-Value="donationModel.StreetAddress2" Label="Street Address Line 2" FullWidth="true" />
+                <MudGrid>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="donationModel.City" Label="City" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="donationModel.Region" Label="Region/State" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="donationModel.PostalCode" Label="Postal / Zip Code" />
+                    </MudItem>
+                </MudGrid>
+                <MudText Typo="Typo.h6" Class="mt-3">Donation Details</MudText>
+                <MudGrid>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="donationModel.Amount"
+                                      For="@(() => donationModel.Amount)"
+                                      Label="Donation Amount" />
+                    </MudItem>
+                </MudGrid>
+
+                <MudTextField @bind-Value="donationModel.Message" Label="Message" Lines="3" Variant="Variant.Outlined" FullWidth="true" />
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Disabled="@selectedFile.IsProcessing" Color="Color.Primary" FullWidth="true" Class="mt-3">
+                    @(selectedFile.IsProcessing ? "Processing..." : "Submit")
+                </MudButton>
+
+                @if (selectedFile.IsProcessing)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+                }
+
+                @if (selectedFile.IsProcessed)
+                {
+                    <MudProgressLinear Value="100" Color="Color.Success" />
+                }
+            </EditForm>
+
+            @*  @if (!string.IsNullOrEmpty(successMessage))
+        {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Class="mt-3">@successMessage</MudAlert>
+        } *@
+        </MudPaper>
+    }
+</MudContainer>
+@* <MudButton Variant="Variant.Filled" Color="Color.Success" Disabled="@(!HasExtractedData)" OnClick="SubmitData">
+    Submit All to Azure
+</MudButton> *@
+@* <EditForm Model="donationModel" OnValidSubmit="SubmitData">
+
+</EditForm>
+ *@
+@* <p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button> *@
