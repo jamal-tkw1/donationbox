@@ -44,6 +44,21 @@ public partial class Donation
     //    }
     //}
 
+    private async Task OnImageSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = new FileUploadInfo
+        {
+            File = e.File,
+            FileName = e.File.Name,
+        };
+
+        // Generate image preview
+        using var stream = e.File.OpenReadStream();
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+       // imagePreview = $"data:{selectedFile.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+    }
+
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
     {
         selectedFiles.Clear();
@@ -158,7 +173,7 @@ public partial class Donation
 
             selectedFiles.Remove(selectedFile); // remove selected file
 
-            donationModel = new DonationModel();    
+            donationModel = new DonationModel();
             selectedFile.IsProcessing = false;
             selectedFile.IsProcessed = true;
             Snackbar.Add($"Submitted successfully!", Severity.Success);

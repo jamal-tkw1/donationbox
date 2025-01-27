@@ -9,6 +9,11 @@
         <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3">Donation Form</MudText>
         <MudCard>
             <MudCardContent>
+                <MudText Typo="Typo.h5" Class="mb-4">Capture and Upload Image</MudText>
+                <!-- File Input with Camera Access -->
+                <InputFile OnChange="OnImageSelected" accept="image/*;capture=camera" />
+
+
                 <MudText Typo="Typo.h4">Upload and Extract Data from Images</MudText>
                 <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
                     <ActivatorContent>
