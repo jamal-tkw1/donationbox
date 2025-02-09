@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Net.Http.Json;
+using System.Reflection.Metadata;
+using Microsoft.JSInterop;
 
 namespace DonationBox.BlazorWebAssembly.Pages;
 
@@ -21,6 +23,10 @@ public partial class Donation
     private string extractedText;
 
     [Inject] private ISnackbar Snackbar { get; set; }
+
+    [Inject] private IJSRuntime JSRuntime { get; set; }
+    private MudFileUpload<IReadOnlyList<IBrowserFile>> fileUpload;
+    private IJSObjectReference? module;
 
     //private async Task OnFilesSelected(InputFileChangeEventArgs e)
     //{
@@ -44,19 +50,35 @@ public partial class Donation
     //    }
     //}
 
-    private async Task OnImageSelected(InputFileChangeEventArgs e)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        selectedFile = new FileUploadInfo
+        if (firstRender)
         {
-            File = e.File,
-            FileName = e.File.Name,
-        };
+            module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./js/camera.js");
+        }
+    }
 
-        // Generate image preview
-        using var stream = e.File.OpenReadStream();
-        using var memoryStream = new MemoryStream();
-        await stream.CopyToAsync(memoryStream);
-       // imagePreview = $"data:{selectedFile.ContentType};base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+    private async Task OpenCamera()
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("clickCameraInput");
+        }
+    }
+
+    private async Task OnCameraCapture(InputFileChangeEventArgs e)
+    {
+        var files = new List<IBrowserFile> { e.File };
+        await UploadFiles(files);
+    }
+
+    private async Task OnCameraCapture(ChangeEventArgs e)
+    {
+        if (e.Value is IReadOnlyList<IBrowserFile> cameraFiles && cameraFiles.Any())
+        {
+            await UploadFiles(cameraFiles);
+        }
     }
 
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)

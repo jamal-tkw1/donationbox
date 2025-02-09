@@ -9,11 +9,6 @@
         <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3">Donation Form</MudText>
         <MudCard>
             <MudCardContent>
-                <MudText Typo="Typo.h5" Class="mb-4">Capture and Upload Image</MudText>
-                <!-- File Input with Camera Access -->
-                <InputFile OnChange="OnImageSelected" accept="image/*;capture=camera" />
-
-
                 <MudText Typo="Typo.h4">Upload and Extract Data from Images</MudText>
                 <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
                     <ActivatorContent>
@@ -22,8 +17,32 @@
                                    StartIcon="@Icons.Material.Filled.CloudUpload">
                             Browse Files
                         </MudButton>
+
+       @*                  <!-- Regular File Upload -->
+                        <MudMenuItem OnClick="() => fileUpload.Click()">
+                            <MudIcon Icon="@Icons.Material.Filled.Upload" /> Browse Files
+                        </MudMenuItem>
+ *@
+                        <!-- Camera Capture -->
+                        <MudMenuItem OnClick="OpenCamera">
+                            <MudIcon Icon="@Icons.Material.Filled.CameraAlt" /> Take Photo
+                        </MudMenuItem>
+
+                        <!-- Hidden Camera Input -->
+                        <InputFile id="cameraInput"
+                                   capture="environment"
+                                   accept="image/*"
+                                   OnChange="OnCameraCapture"
+                                   style="display: none;" />
+
+                        <!-- Regular File Upload -->
+                        <MudFileUpload @ref="fileUpload"
+                                       T="IReadOnlyList<IBrowserFile>"
+                                       FilesChanged="UploadFiles"
+                                       Style="display: none;" />
                     </ActivatorContent>
                 </MudFileUpload>
+
 
             </MudCardContent>
         </MudCard>
